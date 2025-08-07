@@ -1,10 +1,10 @@
 import PostForm from "@/components/PostForm";
 import Feed from "@/components/Feed";
 import { getServerSession } from "next-auth";
-import { authOptions } from "./api/auth/[...nextauth]/route";
-import { SignInButton } from "@/components/SessionButtons";
 import Image from "next/image";
 import UserMenu from "@/components/UserMenu";
+import SignInModal from "@/components/SignInModal";
+import { authOptions } from "@/lib/auth";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
@@ -33,7 +33,7 @@ export default async function Home() {
             height={200}
             className="mx-auto rounded-md opacity-70 mb-4"
           />
-          <SignInButton />
+          <SignInModal />
         </div>
       )}
 
