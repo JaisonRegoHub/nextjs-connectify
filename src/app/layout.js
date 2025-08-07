@@ -7,6 +7,11 @@ import { authOptions } from "@/lib/auth";
 
 const inter = Inter({ subsets: ["latin"] });
 
+export const metadata = {
+  title: "Connectify",
+  description: "Connect with the world in real time",
+};
+
 export default async function RootLayout({ children }) {
   const session = await getServerSession(authOptions);
 
