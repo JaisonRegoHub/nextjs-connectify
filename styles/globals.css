@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+/* Light Theme */
+:root {
+  --background: #fdfbfb;
+  --foreground: #1a1a1a;
+  --primary: #6c5ce7;
+  --secondary: #dfe6e9;
+  --accent: #00cec9;
+}
+
+/* Dark Theme */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #1e1e2f;
+    --foreground: #f5f5f5;
+    --primary: #a29bfe;
+    --secondary: #2f2f44;
+    --accent: #00cec9;
+  }
+
+  body {
+    background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #a18cd1, #fbc2eb);
+    background-size: 400% 400%;
+    animation: gradientFlow 15s ease infinite;
+    color: var(--foreground);
+    font-family: "Inter", sans-serif;
+    transition: all 0.3s ease;
+  }
+
+  /* 🔁 Animate the background gradient */
+  @keyframes gradientFlow {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  /* ✨ Animated Header */
+  .animated-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    background-size: 200% auto;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    animation: shine 3s linear infinite;
+    text-align: center;
+  }
+
+  /* ✨ Shine animation for title */
+  @keyframes shine {
+    0% {
+      background-position: 0% center;
+    }
+    100% {
+      background-position: 200% center;
+    }
+  }
+
+  /* 🌈 Reusable card + button styling */
+  .post-form,
+  .post-card {
+    background-color: var(--secondary);
+    padding: 1rem;
+    border-radius: 0.75rem;
+    color: var(--foreground);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .session-button {
+    color: var(--foreground);
+    border: 1px solid var(--accent);
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    background-color: transparent;
+    transition: background-color 0.3s ease;
+  }
+
+  .session-button:hover {
+    background-color: var(--accent);
+    color: white;
+  }
+
+  /* 🔲 Overlay behind content to improve contrast */
+  .background-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background-color: rgba(0, 0, 0, 0.4); /* For dark overlay */
+    backdrop-filter: blur(3px);
+  }
+
+  /* 🧱 Ensure content stays above the background */
+  .main-content {
+    position: relative;
+    z-index: 10;
+  }
+}
