@@ -9,15 +9,6 @@ export default function UserMenu() {
   const [open, setOpen] = useState(false);
   const menuRef = useRef(null);
 
-  if (!session?.user) return null;
-
-  const user = session.user;
-  const firstLetter =
-    user.name?.charAt(0).toUpperCase() ||
-    user.email?.charAt(0).toUpperCase() ||
-    "?";
-
-  // Click outside to close dropdown
   useEffect(() => {
     function handleClickOutside(e) {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -28,6 +19,14 @@ export default function UserMenu() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  if (!session?.user) return null;
+
+  const user = session.user;
+  const firstLetter =
+    user.name?.charAt(0).toUpperCase() ||
+    user.email?.charAt(0).toUpperCase() ||
+    "?";
 
   return (
     <div className="relative" ref={menuRef}>
