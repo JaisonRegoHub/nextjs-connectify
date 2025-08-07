@@ -41,6 +41,10 @@
     }
   }
 
+  button {
+    cursor: pointer;
+  }
+
   /* ✨ Animated Header */
   .animated-title {
     font-size: 2.5rem;

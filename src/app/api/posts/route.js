@@ -1,17 +1,42 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { uploadToCloudinaryServer } from "@/lib/cloudinary";
 
-const prisma = new PrismaClient();
-
 export async function GET() {
+  const session = await getServerSession(authOptions);
+  const currentUserEmail = session?.user?.email;
+
+  let currentUser = null;
+  if (currentUserEmail) {
+    currentUser = await prisma.user.findUnique({
+      where: { email: currentUserEmail },
+    });
+  }
+
   const posts = await prisma.post.findMany({
     orderBy: { createdAt: "desc" },
-    include: { author: true },
+    include: {
+      author: true,
+      likes: true,
+    },
   });
-  return NextResponse.json(posts);
+
+  const enrichedPosts = posts.map((post) => {
+    const likeCount = post.likes.length;
+    const likedByCurrentUser = currentUser
+      ? post.likes.some((like) => like.userId === currentUser.id)
+      : false;
+
+    return {
+      ...post,
+      likeCount,
+      likedByCurrentUser,
+    };
+  });
+
+  return NextResponse.json(enrichedPosts);
 }
 
 export async function POST(req) {
@@ -34,7 +59,7 @@ export async function POST(req) {
     data: {
       content,
       image: imageUrl,
-      user: { connect: { email: session.user.email } },
+      author: { connect: { email: session.user.email } },
     },
   });
 
