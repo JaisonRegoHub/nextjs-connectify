@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import axios from "axios";
+import apiClient from "@/lib/apiClient";
 import Feed from "@/components/FeedWrapper/Feed/Feed";
 import PostForm from "@/components/FeedWrapper/PostForm/PostForm";
 import Image from "next/image";
@@ -12,7 +12,7 @@ export default function FeedWrapper({ session }) {
 
   const fetchPosts = async () => {
     try {
-      const { data } = await axios.get("/api/posts");
+      const { data } = await apiClient.get("/api/posts");
       setPosts(data);
     } catch (err) {
       console.error("Failed to fetch posts", err);

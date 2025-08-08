@@ -2,33 +2,58 @@
 
 import { useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
+import apiClient from "@/lib/apiClient";
 import styles from "./PostForm.module.css";
 
 export default function PostForm({ onPostCreated }) {
   const { data: session } = useSession();
   const { register, handleSubmit, reset, formState } = useForm();
+  const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
 
-  const onSubmit = async ({ content, image }) => {
+  useEffect(() => {
+    return () => {
+      if (preview) {
+        URL.revokeObjectURL(preview);
+      }
+    };
+  }, [preview]);
+
+  const onSubmit = async ({ content }) => {
     if (!session) return;
+
     const formData = new FormData();
     formData.append("content", content);
-    if (image?.[0]) formData.append("image", image[0]);
-    await axios.post("/api/posts", formData);
-    reset();
-    setPreview(null);
-    onPostCreated?.();
+    if (file) {
+      formData.append("image", file);
+    }
+
+    try {
+      await apiClient.post("/api/posts", formData);
+      reset();
+      setFile(null);
+      setPreview(null);
+      onPostCreated?.();
+    } catch (error) {
+      console.error("Error uploading post:", error);
+    }
   };
 
   const handleImageChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setPreview(URL.createObjectURL(file));
+    const selectedFile = e.target.files?.[0];
+
+    if (selectedFile) {
+      setFile(selectedFile);
+      if (preview) URL.revokeObjectURL(preview);
+      setPreview(URL.createObjectURL(selectedFile));
     } else {
+      setFile(null);
+      if (preview) URL.revokeObjectURL(preview);
       setPreview(null);
     }
+
+    e.target.value = null;
   };
 
   if (!session) return null;
@@ -40,16 +65,28 @@ export default function PostForm({ onPostCreated }) {
         placeholder="What's happening?"
         className={styles.textarea}
       />
+
       <input
+        id="file-upload"
         type="file"
         accept="image/*"
-        {...register("image")}
         onChange={handleImageChange}
-        className={styles.fileInput}
+        className={styles.hiddenFileInput}
       />
+
+      <div className={styles.fileInputWrapper}>
+        <label htmlFor="file-upload" className={styles.fileInputLabel}>
+          Choose Image
+        </label>
+        <span className={styles.fileName}>
+          {file ? file.name : "No file selected"}
+        </span>
+      </div>
+
       {preview && (
         <img src={preview} alt="Preview" className={styles.preview} />
       )}
+
       <button
         type="submit"
         disabled={formState.isSubmitting}

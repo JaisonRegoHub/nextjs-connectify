@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
+import apiClient from "@/lib/apiClient";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
-import axios from "axios";
 import { useState, useEffect } from "react";
 import styles from "./Feed.module.css";
 
@@ -31,7 +31,7 @@ export default function Feed({ posts, setPosts }) {
     );
 
     try {
-      const { data } = await axios.post("/api/like", { postId });
+      const { data } = await apiClient.post("/api/like", { postId });
       if (
         typeof data.liked === "boolean" &&
         typeof data.likeCount === "number"
