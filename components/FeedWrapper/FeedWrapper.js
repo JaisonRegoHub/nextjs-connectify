@@ -2,18 +2,18 @@
 
 import { useState, useEffect } from "react";
 import axios from "axios";
-import Feed from "@/components/Feed";
-import PostForm from "@/components/PostForm";
+import Feed from "@/components/FeedWrapper/Feed/Feed";
+import PostForm from "@/components/FeedWrapper/PostForm/PostForm";
 import Image from "next/image";
-import SignInModal from "@/components/SignInModal";
+import SignInModal from "@/components/FeedWrapper/SignInModal/SignInModal";
 
 export default function FeedWrapper({ session }) {
   const [posts, setPosts] = useState([]);
 
   const fetchPosts = async () => {
     try {
-      const res = await axios.get("/api/posts");
-      setPosts(res.data);
+      const { data } = await axios.get("/api/posts");
+      setPosts(data);
     } catch (err) {
       console.error("Failed to fetch posts", err);
     }
@@ -45,7 +45,6 @@ export default function FeedWrapper({ session }) {
           <SignInModal />
         </div>
       )}
-
       <Feed posts={posts} setPosts={setPosts} />
     </>
   );

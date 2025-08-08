@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import UserMenu from "@/components/UserMenu";
-import FeedWrapper from "@/components/FeedWrapper";
+import UserMenu from "@/components/UserMenu/UserMenu";
+import FeedWrapper from "@/components/FeedWrapper/FeedWrapper";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
