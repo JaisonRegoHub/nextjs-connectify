@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { useState, useEffect } from "react";
-import axios from "axios";
+import apiClient from "@/lib/apiClient";
 import styles from "./PostForm.module.css";
 
 export default function PostForm({ onPostCreated }) {
@@ -30,7 +30,7 @@ export default function PostForm({ onPostCreated }) {
     }
 
     try {
-      await axios.post("/api/posts", formData);
+      await apiClient.post("/api/posts", formData);
       reset();
       setFile(null);
       setPreview(null);
