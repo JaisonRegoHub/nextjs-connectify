@@ -24,7 +24,11 @@ export default function PostForm({ onPostCreated }) {
 
   const handleImageChange = (e) => {
     const file = e.target.files?.[0];
-    if (file) setPreview(URL.createObjectURL(file));
+    if (file) {
+      setPreview(URL.createObjectURL(file));
+    } else {
+      setPreview(null);
+    }
   };
 
   if (!session) return null;
