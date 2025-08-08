@@ -3,19 +3,30 @@
 import Image from "next/image";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import axios from "axios";
+import { useState, useEffect } from "react";
 import styles from "./Feed.module.css";
 
 export default function Feed({ posts, setPosts }) {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (posts) {
+      const timer = setTimeout(() => setLoading(false), 400);
+      return () => clearTimeout(timer);
+    }
+  }, [posts]);
+
   const toggleLike = async (postId) => {
     setPosts((prev) =>
-      prev.map((p) =>
-        p.id === postId
+      prev.map((post) =>
+        post.id === postId
           ? {
-              ...p,
-              likedByCurrentUser: !p.likedByCurrentUser,
-              likeCount: (p.likeCount ?? 0) + (p.likedByCurrentUser ? -1 : 1),
+              ...post,
+              likedByCurrentUser: !post.likedByCurrentUser,
+              likeCount:
+                (post.likeCount ?? 0) + (post.likedByCurrentUser ? -1 : 1),
             }
-          : p
+          : post
       )
     );
 
@@ -26,32 +37,42 @@ export default function Feed({ posts, setPosts }) {
         typeof data.likeCount === "number"
       ) {
         setPosts((prev) =>
-          prev.map((p) =>
-            p.id === postId
+          prev.map((post) =>
+            post.id === postId
               ? {
-                  ...p,
+                  ...post,
                   likedByCurrentUser: data.liked,
                   likeCount: data.likeCount,
                 }
-              : p
+              : post
           )
         );
       }
     } catch {
-      // revert on error
       setPosts((prev) =>
-        prev.map((p) =>
-          p.id === postId
+        prev.map((post) =>
+          post.id === postId
             ? {
-                ...p,
-                likedByCurrentUser: !p.likedByCurrentUser,
-                likeCount: (p.likeCount ?? 0) + (p.likedByCurrentUser ? -1 : 1),
+                ...post,
+                likedByCurrentUser: !post.likedByCurrentUser,
+                likeCount:
+                  (post.likeCount ?? 0) + (post.likedByCurrentUser ? -1 : 1),
               }
-            : p
+            : post
         )
       );
     }
   };
+
+  if (loading) {
+    return (
+      <div className={styles.loadingFeed}>
+        <p className={styles.loadingText}>
+          Loading posts<span className={styles.dotAnimation}>...</span>
+        </p>
+      </div>
+    );
+  }
 
   if (!posts?.length) {
     return (
@@ -85,59 +106,62 @@ export default function Feed({ posts, setPosts }) {
           createdAt,
           likedByCurrentUser,
           likeCount,
-        }) => (
-          <div key={id} className={styles.postCard}>
-            <div className={styles.authorRow}>
-              {author?.image ? (
-                <Image
-                  src={author.image}
-                  alt="avatar"
-                  width={40}
-                  height={40}
-                  className={styles.avatar}
-                />
-              ) : (
-                <div className={styles.avatarFallback}>
-                  {author?.name?.[0] || "?"}
+        }) => {
+          const authorInitial = author?.name?.[0] || "?";
+
+          return (
+            <div key={id} className={styles.postCard}>
+              <div className={styles.authorRow}>
+                {author?.image ? (
+                  <Image
+                    src={author.image}
+                    alt="avatar"
+                    width={40}
+                    height={40}
+                    className={styles.avatar}
+                  />
+                ) : (
+                  <div className={styles.avatarFallback}>{authorInitial}</div>
+                )}
+                <span className={styles.authorName}>
+                  {author?.name || "Anonymous"}
+                </span>
+              </div>
+
+              <p className={styles.postContent}>{content}</p>
+
+              {image && (
+                <div className={styles.postImageWrapper}>
+                  <Image
+                    src={image}
+                    alt="Post image"
+                    width={800}
+                    height={600}
+                    className={styles.postImage}
+                  />
                 </div>
               )}
-              <span className={styles.authorName}>
-                {author?.name || "Anonymous"}
-              </span>
-            </div>
 
-            <p className={styles.postContent}>{content}</p>
-
-            {image && (
-              <div className={styles.postImageWrapper}>
-                <Image
-                  src={image}
-                  alt="Post image"
-                  width={800}
-                  height={600}
-                  className={styles.postImage}
-                />
+              <div className={styles.postFooter}>
+                <p className={styles.postDate}>
+                  {new Date(createdAt).toLocaleString()}
+                </p>
+                <button
+                  onClick={() => toggleLike(id)}
+                  className={styles.likeButton}
+                  aria-label={likedByCurrentUser ? "Unlike post" : "Like post"}
+                >
+                  {likedByCurrentUser ? (
+                    <FaHeart className={styles.likedIcon} />
+                  ) : (
+                    <FaRegHeart className={styles.unlikedIcon} />
+                  )}
+                  <span>{likeCount ?? 0}</span>
+                </button>
               </div>
-            )}
-
-            <div className={styles.postFooter}>
-              <p className={styles.postDate}>
-                {new Date(createdAt).toLocaleString()}
-              </p>
-              <button
-                onClick={() => toggleLike(id)}
-                className={styles.likeButton}
-              >
-                {likedByCurrentUser ? (
-                  <FaHeart className={styles.likedIcon} />
-                ) : (
-                  <FaRegHeart className={styles.unlikedIcon} />
-                )}
-                <span>{Number(likeCount ?? 0)}</span>
-              </button>
             </div>
-          </div>
-        )
+          );
+        }
       )}
     </div>
   );
