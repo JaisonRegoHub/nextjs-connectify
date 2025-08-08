@@ -1,4 +1,3 @@
-// app/layout.js
 import "../../styles/globals.css";
 import { Inter } from "next/font/google";
 import { getServerSession } from "next-auth";
@@ -17,13 +16,10 @@ export default async function RootLayout({ children }) {
 
   return (
     <html lang="en">
-      <body className={`${inter.className} relative`}>
-        <div className="fixed inset-0 z-0 animate-gradient bg-gradient-to-br from-[#1e1e2f] via-[#3a3a5f] to-[#1e1e2f] bg-[length:400%_400%]"></div>
-
-        <div className="fixed inset-0 z-10 bg-black/40 backdrop-blur-sm"></div>
-
+      <body className={inter.className}>
+        <div className="background-overlay"></div>
         <SessionProvider session={session}>
-          <main className="relative z-20">{children}</main>
+          <main className="main-content">{children}</main>
         </SessionProvider>
       </body>
     </html>

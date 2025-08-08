@@ -3,6 +3,7 @@
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import styles from "./UserMenu.module.css";
 
 export default function UserMenu() {
   const { data: session } = useSession();
@@ -10,29 +11,28 @@ export default function UserMenu() {
   const menuRef = useRef(null);
 
   useEffect(() => {
-    function handleClickOutside(e) {
+    const handleClickOutside = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
         setOpen(false);
       }
-    }
-
+    };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   if (!session?.user) return null;
 
-  const user = session.user;
+  const { user } = session;
   const firstLetter =
     user.name?.charAt(0).toUpperCase() ||
     user.email?.charAt(0).toUpperCase() ||
     "?";
 
   return (
-    <div className="relative" ref={menuRef}>
+    <div ref={menuRef} className={styles.wrapper}>
       <button
         onClick={() => setOpen((prev) => !prev)}
-        className="w-10 h-10 rounded-full border border-zinc-600 bg-slate-700 text-white font-bold flex items-center justify-center overflow-hidden"
+        className={styles.avatarButton}
       >
         {user.image ? (
           <Image
@@ -40,19 +40,15 @@ export default function UserMenu() {
             alt="avatar"
             width={40}
             height={40}
-            className="rounded-full object-cover"
+            className={styles.avatarImage}
           />
         ) : (
           firstLetter
         )}
       </button>
-
       {open && (
-        <div className="absolute right-0 mt-2 w-36 bg-slate-800 text-white rounded-xl shadow-md border border-zinc-700 py-1 z-50">
-          <button
-            onClick={() => signOut()}
-            className="w-full text-left px-3 py-1.5 hover:bg-zinc-700 text-sm rounded-md"
-          >
+        <div className={styles.menu}>
+          <button onClick={() => signOut()} className={styles.menuItem}>
             Sign out
           </button>
         </div>

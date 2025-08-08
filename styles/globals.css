@@ -20,15 +20,15 @@
   }
 
   body {
-    background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #a18cd1, #fbc2eb);
+    background: linear-gradient(-45deg, #1e1e2f, #3a3a5f, #1e1e2f);
     background-size: 400% 400%;
     animation: gradientFlow 15s ease infinite;
     color: var(--foreground);
     font-family: "Inter", sans-serif;
     transition: all 0.3s ease;
+    position: relative;
   }
 
-  /* 🔁 Animate the background gradient */
   @keyframes gradientFlow {
     0% {
       background-position: 0% 50%;
@@ -45,7 +45,6 @@
     cursor: pointer;
   }
 
-  /* ✨ Animated Header */
   .animated-title {
     font-size: 2.5rem;
     font-weight: 800;
@@ -58,7 +57,6 @@
     text-align: center;
   }
 
-  /* ✨ Shine animation for title */
   @keyframes shine {
     0% {
       background-position: 0% center;
@@ -68,7 +66,6 @@
     }
   }
 
-  /* 🌈 Reusable card + button styling */
   .post-form,
   .post-card {
     background-color: var(--secondary);
@@ -92,16 +89,14 @@
     color: white;
   }
 
-  /* 🔲 Overlay behind content to improve contrast */
   .background-overlay {
     position: fixed;
     inset: 0;
     z-index: 0;
-    background-color: rgba(0, 0, 0, 0.4); /* For dark overlay */
+    background-color: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(3px);
   }
 
-  /* 🧱 Ensure content stays above the background */
   .main-content {
     position: relative;
     z-index: 10;

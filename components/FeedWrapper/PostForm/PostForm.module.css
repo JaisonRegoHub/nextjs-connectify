@@ -1,0 +1,65 @@
+.form {
+  background-color: rgb(30 41 59);
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.textarea {
+  width: 100%;
+  background-color: rgb(51 65 85);
+  padding: 0.75rem;
+  border-radius: 0.375rem;
+  color: white;
+  outline: none;
+}
+
+.textarea::placeholder {
+  color: rgb(156 163 175);
+}
+
+.textarea:focus {
+  box-shadow: 0 0 0 2px rgb(20 184 166);
+}
+
+.fileInput {
+  font-size: 0.875rem;
+  color: white;
+}
+
+.fileInput::file-selector-button {
+  background-color: rgb(99 102 241);
+  color: white;
+  border-radius: 0.375rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.fileInput::file-selector-button:hover {
+  background-color: rgb(79 70 229);
+}
+
+.preview {
+  width: 100%;
+  border-radius: 0.375rem;
+  border: 1px solid rgb(51 65 85);
+}
+
+.submitBtn {
+  background-color: rgb(20 184 166);
+  color: white;
+  font-weight: 600;
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s;
+}
+
+.submitBtn:hover {
+  background-color: rgb(13 148 136);
+}
+
+.submitBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
