@@ -1,109 +1,158 @@
 # 🌐 Connectify — A Twitter-Like Social App
 
-A modern, responsive social media platform built with **Next.js 13+**, **App Router**, **GitHub Authentication**, **Prisma ORM**, **TailwindCSS**, and **Cloudinary** for media uploads.
+Connectify is a modern, responsive social media platform inspired by Twitter, built with the latest **Next.js 13+** features. It features GitHub OAuth authentication, image uploads via Cloudinary, Prisma ORM for database management, and TailwindCSS for styling — all designed to deliver a smooth developer and user experience.
 
 ---
 
 ## 🚀 Features
 
-- 🔐 GitHub Auth via **NextAuth.js**
-- 🖼️ Image uploads via **Cloudinary**
-- 📸 Rich post editor with image previews
-- 🧵 Infinite feed of posts
-- 🌗 Dark mode-ready theme
-- 🎨 Custom background animation & visual polish
-- 💬 Dynamic empty states & animated branding
+- 🔐 GitHub Authentication powered by **NextAuth.js**
+- 🖼️ Image uploads and hosting via **Cloudinary**
+- 📸 Rich post editor with live image previews
+- 🧵 Infinite scrolling feed of posts
+- 🌗 Fully responsive with Dark Mode support
+- 🎨 Custom background animations and polished UI
+- 💬 Dynamic empty states with animated branding visuals
+- ❤️ Like system with real-time updates (Prisma + API)
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Framework**: Next.js 13+ (App Router, Server Actions)
-- **Auth**: NextAuth.js (GitHub OAuth)
-- **ORM**: Prisma + SQLite/PostgreSQL
-- **Styling**: TailwindCSS + custom global theme
-- **Media**: Cloudinary image hosting
-- **Deployment**: Vercel (recommended)
+| Layer          | Technology                               |
+| -------------- | ---------------------------------------- |
+| Framework      | Next.js 13+ (App Router, Server Actions) |
+| Authentication | NextAuth.js (GitHub OAuth)               |
+| ORM            | Prisma ORM (Neon / PostgreSQL)           |
+| Styling        | TailwindCSS + Custom Global Theme        |
+| Media          | Cloudinary Image Hosting                 |
+| Deployment     | Vercel (recommended)                     |
 
 ---
 
 ## 📂 Project Structure
 
 ```
+components
+├── FeedWrapper           # Container wrapping feed-related components
+│   ├── Feed              # Displays infinite list of posts
+│   │   ├── Feed.js
+│   │   └── Feed.module.css
+│   ├── PostForm          # Post editor for authenticated users
+│   │   ├── PostForm.js
+│   │   └── PostForm.module.css
+│   ├── SignInModal       # Modal prompting user sign-in
+│   │   ├── SignInModal.js
+│   │   └── SignInModal.module.css
+│   └── FeedWrapper.js    # Orchestrates Feed, PostForm, and SignInModal
+├── Session               # User session management components
+│   ├── SessionProvider.js
+│   └── UserSessionChecker.js
+└── UserMenu              # User profile menu UI
+    ├── UserMenu.js
+    └── UserMenu.module.css
 
-/app
-/api
-/posts       → CRUD routes for posts
-layout.js       → Root layout + session provider
-page.js         → Home page (feed + post form)
+lib
+├── apiClient.js          # API helper functions
+├── auth.js               # Authentication utilities
+├── cloudinary.js         # Cloudinary upload helper
+└── prisma.js             # Prisma client initialization
 
-/components
-Feed.js         → Renders all posts
-PostForm.js     → Authenticated post editor
-SessionButtons.js → Sign In / Sign Out
+prisma
+├── schema.prisma         # Data model (User, Post, Like)
+└── migrations/           # Database migrations
 
-/lib
-cloudinary.js   → Upload helper for Cloudinary
+src/app
+├── api
+│   ├── auth              # Authentication API routes ([...nextauth], check-user)
+│   ├── like              # API routes for liking posts
+│   └── posts             # CRUD API routes for posts
+├── layout.js             # Root layout & session provider
+└── page.js               # Home page (feed + post form)
 
-/prisma
-schema.prisma   → Data model (User & Post)
-migrations/     → DB versioning
+public                   # Static assets like images and icons
 
+styles
+└── globals.css           # Global styles
 ```
 
 ---
 
-## ⚙️ Setup Instructions
+## ⚙️ Setup Instructions (Using Neon Database)
 
-1. **Clone repo**
-
-```bash
-git clone https://github.com/yourusername/connectify.git
-cd connectify
-```
-
-2. **Install deps**
+### 1. Install dependencies
 
 ```bash
 npm install
 ```
 
-3. **Set up `.env.local`**
+### 2. Configure environment variables
+
+Create a `.env.local` file in the project root with your Neon database URL and API keys:
 
 ```env
-DATABASE_URL="file:./dev.db" # or PostgreSQL URL
-GITHUB_CLIENT_ID=your_client_id
-GITHUB_CLIENT_SECRET=your_secret
-NEXTAUTH_SECRET=generate_one
-CLOUDINARY_CLOUD_NAME=your_cloud
-CLOUDINARY_API_KEY=your_key
-CLOUDINARY_API_SECRET=your_secret
+DATABASE_URL="your_neon_database_url_here"
+GITHUB_ID=your_github_oauth_client_id
+GITHUB_SECRET=your_github_oauth_client_secret
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+NEXTAUTH_SECRET=your_generated_secret
+CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
 ```
 
-4. **Set up DB**
+> **Tip:** Generate `NEXTAUTH_SECRET` securely with:
+> `openssl rand -base64 32`
+
+### 3. Start Neon proxy
+
+Ensure you have Neon CLI installed or use npx:
 
 ```bash
-npx prisma migrate dev --name init
+npx neon run
 ```
 
-5. **Run the dev server**
+This command starts a local proxy that connects your app to the Neon cloud database.
+
+### 4. Push Prisma schema to Neon
+
+Instead of migrations, use Prisma’s push command to sync the schema:
+
+```bash
+npx prisma db push
+```
+
+> This command creates or updates tables in your Neon database based on your Prisma schema.
+
+### 5. Run the development server
 
 ```bash
 npm run dev
 ```
 
----
-
-## 📸 Screenshots
-
-_Add yours here!_
+Open [http://localhost:3000](http://localhost:3000) in your browser to see Connectify live.
 
 ---
 
-## 🧠 Credits
+## 🧩 How It Works — Component Breakdown
 
-Built by Dragneel 🧙‍♂️ — Senior Dev & UI/UX Enhancer
-Inspired by Twitter, powered by modern tools.
+### FeedWrapper
+
+The main container managing the feed UI, wrapping:
+
+- **Feed**: Displays an infinite scrolling list of posts with likes and comments.
+- **PostForm**: Authenticated post editor allowing users to create posts with images.
+- **SignInModal**: Modal dialog prompting users to sign in when interaction requires authentication.
+
+### Session Components
+
+- **SessionProvider**: Provides authentication context to the app.
+- **UserSessionChecker**: Helper to verify user session status.
+
+### UserMenu
+
+Dropdown menu for logged-in users to access profile and sign-out options.
 
 ---
 
