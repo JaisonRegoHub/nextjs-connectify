@@ -10,31 +10,26 @@ export async function POST(req) {
   }
 
   const { postId } = await req.json();
+
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
   });
 
-  const existingLike = await prisma.like.findUnique({
-    where: {
-      userId_postId: {
-        userId: user.id,
-        postId,
-      },
-    },
-  });
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const likeWhere = { userId_postId: { userId: user.id, postId } };
+  const existingLike = await prisma.like.findUnique({ where: likeWhere });
 
   if (existingLike) {
-    await prisma.like.delete({
-      where: { userId_postId: { userId: user.id, postId } },
-    });
+    await prisma.like.delete({ where: likeWhere });
     return NextResponse.json({ liked: false });
-  } else {
-    await prisma.like.create({
-      data: {
-        userId: user.id,
-        postId,
-      },
-    });
-    return NextResponse.json({ liked: true });
   }
+
+  await prisma.like.create({
+    data: { userId: user.id, postId },
+  });
+
+  return NextResponse.json({ liked: true });
 }

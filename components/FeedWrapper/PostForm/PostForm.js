@@ -65,15 +65,28 @@ export default function PostForm({ onPostCreated }) {
         placeholder="What's happening?"
         className={styles.textarea}
       />
+
       <input
+        id="file-upload"
         type="file"
         accept="image/*"
         onChange={handleImageChange}
-        className={styles.fileInput}
+        className={styles.hiddenFileInput}
       />
+
+      <div className={styles.fileInputWrapper}>
+        <label htmlFor="file-upload" className={styles.fileInputLabel}>
+          Choose Image
+        </label>
+        <span className={styles.fileName}>
+          {file ? file.name : "No file selected"}
+        </span>
+      </div>
+
       {preview && (
         <img src={preview} alt="Preview" className={styles.preview} />
       )}
+
       <button
         type="submit"
         disabled={formState.isSubmitting}
