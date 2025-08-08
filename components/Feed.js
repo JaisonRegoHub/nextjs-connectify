@@ -1,48 +1,71 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import axios from "axios";
 import Image from "next/image";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
-import { useSession } from "next-auth/react";
+import axios from "axios";
 
-export default function Feed() {
-  const [posts, setPosts] = useState([]);
-  const { data: session } = useSession();
-
-  useEffect(() => {
-    const fetchPosts = async () => {
-      const res = await axios.get("/api/posts");
-      setPosts(res.data);
-    };
-    fetchPosts();
-  }, []);
-
+export default function Feed({ posts, setPosts }) {
   const toggleLike = async (postId) => {
+    let originalLiked = false;
+    let originalCount = 0;
+
+    setPosts((prev) => {
+      const idx = prev.findIndex((p) => p.id === postId);
+      if (idx === -1) return prev;
+      originalLiked = !!prev[idx].likedByCurrentUser;
+      originalCount = Number(prev[idx].likeCount ?? 0);
+      const optimisticLiked = !originalLiked;
+      const optimisticCount = originalCount + (optimisticLiked ? 1 : -1);
+      return prev.map((p) =>
+        p.id === postId
+          ? {
+              ...p,
+              likedByCurrentUser: optimisticLiked,
+              likeCount: optimisticCount,
+            }
+          : p
+      );
+    });
+
     try {
       const res = await axios.post("/api/like", { postId });
-      const { liked } = res.data;
-
-      // Update state without full reload
-      setPosts((prevPosts) =>
-        prevPosts.map((post) =>
-          post.id === postId
-            ? {
-                ...post,
-                likedByCurrentUser: liked,
-                likeCount: post.likeCount + (liked ? 1 : -1),
-              }
-            : post
+      const likedFromServer =
+        typeof res.data?.liked === "boolean" ? res.data.liked : undefined;
+      const countFromServer =
+        typeof res.data?.likeCount === "number"
+          ? res.data.likeCount
+          : undefined;
+      const finalLiked =
+        likedFromServer === undefined ? !originalLiked : likedFromServer;
+      const finalCount =
+        countFromServer !== undefined
+          ? countFromServer
+          : originalCount + ((finalLiked ? 1 : 0) - (originalLiked ? 1 : 0));
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.id === postId
+            ? { ...p, likedByCurrentUser: finalLiked, likeCount: finalCount }
+            : p
         )
       );
     } catch (err) {
-      console.error("Like toggle failed", err);
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.id === postId
+            ? {
+                ...p,
+                likedByCurrentUser: originalLiked,
+                likeCount: originalCount,
+              }
+            : p
+        )
+      );
     }
   };
 
   return (
     <div className="space-y-8 mt-10">
-      {posts.length === 0 ? (
+      {!posts || posts.length === 0 ? (
         <div className="text-center text-slate-400 mt-10">
           <p className="text-xl font-semibold">
             Your feed is quiet... for now 🧘
@@ -105,14 +128,14 @@ export default function Feed() {
 
               <button
                 onClick={() => toggleLike(post.id)}
-                className="flex items-center gap-2 text-red-400"
+                className="flex items-center gap-2 text-red-400 transition-transform duration-150 active:scale-125"
               >
                 {post.likedByCurrentUser ? (
-                  <FaHeart className="text-xl" />
+                  <FaHeart className="text-xl animate-pulse" />
                 ) : (
                   <FaRegHeart className="text-xl" />
                 )}
-                <span className="text-sm">{post.likeCount}</span>
+                <span className="text-sm">{Number(post.likeCount ?? 0)}</span>
               </button>
             </div>
           </div>

@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import axios from "axios";
 
-export default function PostForm() {
+export default function PostForm({ onPostCreated }) {
   const { data: session } = useSession();
   const {
     register,
@@ -27,6 +27,7 @@ export default function PostForm() {
     await axios.post("/api/posts", formData);
     reset();
     setPreview(null);
+    onPostCreated?.();
   };
 
   if (!session) return null;
